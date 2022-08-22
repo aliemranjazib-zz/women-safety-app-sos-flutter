@@ -1,8 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:women_safety_app/widgets/CustomCarouel.dart';
 import 'package:women_safety_app/widgets/custom_appBar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -40,6 +39,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     getRandomQuote();
                   }),
+              Expanded(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    CustomCarouel(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Emergencies",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
