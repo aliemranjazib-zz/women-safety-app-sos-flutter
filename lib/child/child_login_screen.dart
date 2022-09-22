@@ -1,12 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:women_safety_app/components/PrimaryButton.dart';
 import 'package:women_safety_app/components/SecondaryButton.dart';
 import 'package:women_safety_app/components/custom_textfield.dart';
 import 'package:women_safety_app/child/register_child.dart';
+import 'package:women_safety_app/db/share_pref.dart';
 import 'package:women_safety_app/home_screen.dart';
 import 'package:women_safety_app/parent/parent_register_screen.dart';
 import 'package:women_safety_app/utils/constants.dart';
+
+import '../parent/parent_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -33,7 +38,21 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           isLoading = false;
         });
-        goTo(context, HomeScreen());
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get()
+            .then((value) {
+          if (value['type'] == 'parent') {
+            print(value['type']);
+            MySharedPrefference.saveUserType('parent');
+            goTo(context, ParentHomeScreen());
+          } else {
+            MySharedPrefference.saveUserType('child');
+
+            goTo(context, HomeScreen());
+          }
+        });
       }
     } on FirebaseAuthException catch (e) {
       setState(() {

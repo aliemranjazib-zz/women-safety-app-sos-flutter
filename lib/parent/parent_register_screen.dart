@@ -41,12 +41,12 @@ class _RegisterParentScreenState extends State<RegisterParentScreen> {
               FirebaseFirestore.instance.collection('users').doc(v);
 
           final user = UserModel(
-            name: _formData['name'].toString(),
-            phone: _formData['phone'].toString(),
-            childEmail: _formData['cemail'].toString(),
-            guardianEmail: _formData['gemail'].toString(),
-            id: v,
-          );
+              name: _formData['name'].toString(),
+              phone: _formData['phone'].toString(),
+              childEmail: _formData['cemail'].toString(),
+              guardianEmail: _formData['gemail'].toString(),
+              id: v,
+              type: 'parent');
           final jsonData = user.toJson();
           await db.set(jsonData).whenComplete(() {
             goTo(context, LoginScreen());

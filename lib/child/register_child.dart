@@ -52,6 +52,7 @@ class _RegisterChildScreenState extends State<RegisterChildScreen> {
             childEmail: _formData['cemail'].toString(),
             guardianEmail: _formData['gemail'].toString(),
             id: v,
+            type: 'child',
           );
           final jsonData = user.toJson();
           await db.set(jsonData).whenComplete(() {
