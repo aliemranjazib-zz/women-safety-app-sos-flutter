@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:women_safety_app/child/bottom_screens/add_contacts.dart';
 import 'package:women_safety_app/child/bottom_screens/chat_page.dart';
 import 'package:women_safety_app/child/bottom_screens/child_home_page.dart';
 import 'package:women_safety_app/child/bottom_screens/contacts_page.dart';
@@ -16,7 +17,7 @@ class _BottomPageState extends State<BottomPage> {
   int currentIndex = 0;
   List<Widget> pages = [
     HomeScreen(),
-    ContactsPage(),
+    AddContactsPage(),
     ChatPage(),
     ProfilePage(),
     ReviewPage(),
