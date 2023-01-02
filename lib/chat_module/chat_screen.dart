@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:women_safety_app/chat_module/message_text_field.dart';
 import 'package:women_safety_app/chat_module/singleMessage.dart';
-import 'package:women_safety_app/child/child_login_screen.dart';
 
 import '../utils/constants.dart';
 
@@ -100,7 +98,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
-            MessageTextField(),
+            MessageTextField(
+              currentId: widget.currentUserId,
+              friendId: widget.friendId,
+            ),
           ],
         ));
   }
