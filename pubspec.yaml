@@ -53,6 +53,10 @@ dependencies:
   background_sms: ^0.0.4
   geolocator: ^9.0.2
   geocoding: ^2.0.5
+  image_picker: ^0.8.6+1
+  uuid: ^3.0.7
+  firebase_storage: ^10.3.11
+  cached_network_image: ^3.2.3
 
 
 
