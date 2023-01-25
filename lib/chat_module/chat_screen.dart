@@ -61,6 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     .collection('messages')
                     .doc(widget.friendId)
                     .collection('chats')
+                    .orderBy('date', descending: false)
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {

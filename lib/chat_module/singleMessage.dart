@@ -124,7 +124,7 @@ class SingleMessage extends StatelessWidget {
                         CachedNetworkImage(
                           imageUrl: message!,
                           fit: BoxFit.cover,
-                          height: size.height / 3.52,
+                          height: size.height / 3.62,
                           width: size.width,
                           placeholder: (context, url) =>
                               CircularProgressIndicator(),
