@@ -46,6 +46,7 @@ class _RegisterParentScreenState extends State<RegisterParentScreen> {
               childEmail: _formData['cemail'].toString(),
               guardianEmail: _formData['gemail'].toString(),
               id: v,
+              
               type: 'parent');
           final jsonData = user.toJson();
           await db.set(jsonData).whenComplete(() {

@@ -36,6 +36,7 @@ class _SafeHomeState extends State<SafeHome> {
       permission = await Geolocator.requestPermission();
       Fluttertoast.showToast(msg: "Location permissions are  denind");
       if (permission == LocationPermission.deniedForever) {
+        await Geolocator.requestPermission();
         Fluttertoast.showToast(
             msg: "Location permissions are permanently denind");
       }
@@ -108,7 +109,7 @@ class _SafeHomeState extends State<SafeHome> {
                           await DatabaseHelper().getContactList();
 
                       String messageBody =
-                          "https://www.google.com/maps/search/?api=1&query=${_curentPosition!.latitude}%2C${_curentPosition!.longitude}. $_curentAddress";
+                          "https://www.google.com/maps/search/?api=1&query=33%2C33";
                       if (await _isPermissionGranted()) {
                         contactList.forEach((element) {
                           _sendSms("${element.number}",
