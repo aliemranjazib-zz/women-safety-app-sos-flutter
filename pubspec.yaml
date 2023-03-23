@@ -58,7 +58,7 @@ dependencies:
   firebase_storage: ^11.0.11
   cached_network_image: ^3.2.3
   shake: ^2.2.0
-  # workmanager: ^0.5.1
+
   # flutter_background_service: ^2.4.6
 
 

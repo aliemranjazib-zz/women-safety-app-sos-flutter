@@ -4,7 +4,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:women_safety_app/components/PrimaryButton.dart';
 import 'package:women_safety_app/db/db_services.dart';
 import 'package:women_safety_app/model/contactsm.dart';
 
@@ -30,18 +29,39 @@ class _SafeHomeState extends State<SafeHome> {
     }
   }
 
-  _getCurrentLocation() async {
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      Fluttertoast.showToast(msg: "Location permissions are  denind");
-      if (permission == LocationPermission.deniedForever) {
-        await Geolocator.requestPermission();
-        Fluttertoast.showToast(
-            msg: "Location permissions are permanently denind");
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
       }
     }
-    Geolocator.getCurrentPosition(
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  _getCurrentLocation() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high,
             forceAndroidLocationManager: true)
         .then((Position position) {
@@ -107,16 +127,22 @@ class _SafeHomeState extends State<SafeHome> {
                       String recipients = "";
                       List<TContact> contactList =
                           await DatabaseHelper().getContactList();
-
-                      String messageBody =
-                          "https://www.google.com/maps/search/?api=1&query=33%2C33";
-                      if (await _isPermissionGranted()) {
-                        contactList.forEach((element) {
-                          _sendSms("${element.number}",
-                              "i am in trouble $messageBody");
-                        });
+                      print(contactList.length);
+                      if (contactList.isEmpty) {
+                        Fluttertoast.showToast(
+                            msg: "emergency contact is empty");
                       } else {
-                        Fluttertoast.showToast(msg: "something wrong");
+                        String messageBody =
+                            "https://www.google.com/maps/search/?api=1&query=${_curentPosition!.latitude}%2C${_curentPosition!.longitude}. $_curentAddress";
+
+                        if (await _isPermissionGranted()) {
+                          contactList.forEach((element) {
+                            _sendSms("${element.number}",
+                                "i am in trouble $messageBody");
+                          });
+                        } else {
+                          Fluttertoast.showToast(msg: "something wrong");
+                        }
                       }
                     }),
               ],
@@ -163,6 +189,35 @@ class _SafeHomeState extends State<SafeHome> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class PrimaryButton extends StatelessWidget {
+  final String title;
+  final Function onPressed;
+  bool loading;
+  PrimaryButton(
+      {required this.title, required this.onPressed, this.loading = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      width: MediaQuery.of(context).size.width * 0.5,
+      child: ElevatedButton(
+        onPressed: () {
+          onPressed();
+        },
+        child: Text(
+          title,
+          style: TextStyle(fontSize: 17),
+        ),
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.pink,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30))),
       ),
     );
   }
