@@ -16,7 +16,7 @@ class _SafeHomeState extends State<SafeHome> {
   Position? _curentPosition;
   String? _curentAddress;
   LocationPermission? permission;
-  _getPermission() async => await [Permission.sms].request();
+
   _isPermissionGranted() async => await Permission.sms.status.isGranted;
   _sendSms(String phoneNumber, String message, {int? simSlot}) async {
     SmsStatus result = await BackgroundSms.sendMessage(
@@ -93,7 +93,7 @@ class _SafeHomeState extends State<SafeHome> {
   @override
   void initState() {
     super.initState();
-    _getPermission();
+
     _getCurrentLocation();
   }
 

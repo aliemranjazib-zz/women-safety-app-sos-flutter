@@ -58,8 +58,12 @@ dependencies:
   firebase_storage: ^11.0.11
   cached_network_image: ^3.2.3
   shake: ^2.2.0
+  # device_info_plus: ^8.1.0
 
-  # flutter_background_service: ^2.4.6
+  flutter_background_service: ^2.4.6
+  flutter_background_service_android: ^3.0.3
+  flutter_background_service_ios: ^2.4.0
+  flutter_local_notifications: ^8.2.0
 
 
 

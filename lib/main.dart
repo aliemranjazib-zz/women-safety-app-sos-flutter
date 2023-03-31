@@ -6,6 +6,7 @@ import 'package:women_safety_app/db/share_pref.dart';
 import 'package:women_safety_app/child/child_login_screen.dart';
 import 'package:women_safety_app/parent/parent_home_screen.dart';
 import 'package:women_safety_app/utils/constants.dart';
+import 'package:women_safety_app/utils/flutter_background_services.dart';
 import 'child/bottom_page.dart';
 
 final navigatorkey = GlobalKey<ScaffoldMessengerState>();
@@ -14,6 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await MySharedPrefference.init();
+  await initializeService();
   runApp(const MyApp());
 }
 
