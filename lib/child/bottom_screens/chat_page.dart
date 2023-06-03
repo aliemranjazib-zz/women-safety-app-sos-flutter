@@ -2,11 +2,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:women_safety_app/chat_module/chat_screen.dart';
+import 'package:women_safety_app/child/child_login_screen.dart';
+import 'package:women_safety_app/db/share_pref.dart';
 
 import '../../utils/constants.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    if (FirebaseAuth.instance.currentUser!.uid.isEmpty) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

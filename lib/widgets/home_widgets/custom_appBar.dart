@@ -17,9 +17,8 @@ class CustomAppBar extends StatelessWidget {
       child: Container(
         child: Text(
           sweetSayings[quoteIndex!],
-          style: TextStyle(
-            fontSize: 22,
-          ),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
       ),
     );

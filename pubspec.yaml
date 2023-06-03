@@ -48,7 +48,6 @@ dependencies:
   shared_preferences: ^2.0.15
   permission_handler: ^10.0.2
   contacts_service: ^0.6.3
-  provider: ^6.0.4
   sqflite: ^2.2.0+3
   background_sms: ^0.0.4
   geolocator: ^9.0.2
@@ -64,6 +63,10 @@ dependencies:
   flutter_background_service_android: ^3.0.3
   flutter_background_service_ios: ^2.4.0
   flutter_local_notifications: ^8.2.0
+  vibration: ^1.7.6
+  telephony: ^0.2.0
+  # flutter_sms: ^2.3.3
+  
 
 
 

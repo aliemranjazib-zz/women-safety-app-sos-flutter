@@ -7,6 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shake/shake.dart';
+import 'package:telephony/telephony.dart';
 import 'package:women_safety_app/db/db_services.dart';
 import 'package:women_safety_app/model/contactsm.dart';
 import 'package:women_safety_app/widgets/home_widgets/CustomCarouel.dart';
@@ -28,16 +29,16 @@ class _HomeScreenState extends State<HomeScreen> {
   LocationPermission? permission;
   _getPermission() async => await [Permission.sms].request();
   _isPermissionGranted() async => await Permission.sms.status.isGranted;
-  _sendSms(String phoneNumber, String message, {int? simSlot}) async {
-    SmsStatus result = await BackgroundSms.sendMessage(
-        phoneNumber: phoneNumber, message: message, simSlot: 1);
-    if (result == SmsStatus.sent) {
-      print("Sent");
-      Fluttertoast.showToast(msg: "send");
-    } else {
-      Fluttertoast.showToast(msg: "failed");
-    }
-  }
+  // _sendSms(String phoneNumber, String message, {int? simSlot}) async {
+  //   SmsStatus result = await BackgroundSms.sendMessage(
+  //       phoneNumber: phoneNumber, message: message, simSlot: 1);
+  //   if (result == SmsStatus.sent) {
+  //     print("Sent");
+  //     Fluttertoast.showToast(msg: "send");
+  //   } else {
+  //     Fluttertoast.showToast(msg: "failed");
+  //   }
+  // }
 
   Future<bool> _handleLocationPermission() async {
     bool serviceEnabled;
@@ -70,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _getCurrentLocation() async {
     final hasPermission = await _handleLocationPermission();
+    final Telephony telephony = Telephony.instance;
+    await telephony.requestPhoneAndSmsPermissions;
     if (!hasPermission) return;
     await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high,
@@ -114,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "https://maps.google.com/?daddr=${_curentPosition!.latitude},${_curentPosition!.longitude}";
     if (await _isPermissionGranted()) {
       contactList.forEach((element) {
-        _sendSms("${element.number}", "i am in trouble $messageBody");
+        // _sendSms("${element.number}", "i am in trouble $messageBody");
       });
     } else {
       Fluttertoast.showToast(msg: "something wrong");
@@ -127,22 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _getPermission();
     _getCurrentLocation();
+
     ////// shake feature ///
-    ShakeDetector.autoStart(
-      onPhoneShake: () {
-        getAndSendSms();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Shake!'),
-          ),
-        );
-        // Do stuff on phone shake
-      },
-      minimumShakeCount: 1,
-      shakeSlopTimeMS: 500,
-      shakeCountResetTime: 3000,
-      shakeThresholdGravity: 2.7,
-    );
 
     // To close: detector.stopListening();
     // ShakeDetector.waitForStart() waits for user to call detector.startListening();
@@ -151,38 +140,75 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
+              SizedBox(
+                height: 10,
+                child: Container(
+                  color: Colors.grey.shade100,
+                ),
+              ),
+              SizedBox(height: 5),
               CustomAppBar(
                   quoteIndex: qIndex,
                   onTap: () {
                     getRandomQuote();
                   }),
+              SizedBox(height: 5),
+              SizedBox(
+                height: 10,
+                child: Container(
+                  color: Colors.grey.shade100,
+                ),
+              ),
               Expanded(
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                    CustomCarouel(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Emergency",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                    SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Incase of emergency dial me",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     Emergency(),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Explore LiveSafe",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                    SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Explore your power",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
+                    SizedBox(height: 10),
+                    CustomCarouel(),
+                    SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Explore LiveSafe",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
                     LiveSafe(),
                     SafeHome(),
                   ],

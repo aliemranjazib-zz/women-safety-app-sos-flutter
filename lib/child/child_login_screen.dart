@@ -23,6 +23,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formData = Map<String, Object>();
   bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   _onSubmit() async {
     _formKey.currentState!.save();
     try {
