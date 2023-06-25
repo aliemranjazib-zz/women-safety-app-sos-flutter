@@ -17,8 +17,8 @@ class _BottomPageState extends State<BottomPage> {
   List<Widget> pages = [
     HomeScreen(),
     AddContactsPage(),
-    ChatPage(),
-    ProfilePage(),
+    CheckUserStatusBeforeChat(),
+    CheckUserStatusBeforeChatOnProfile(),
     ReviewPage(),
   ];
   onTapped(int index) {

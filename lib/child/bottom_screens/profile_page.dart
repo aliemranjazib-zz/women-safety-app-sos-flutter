@@ -13,6 +13,29 @@ import 'package:women_safety_app/components/PrimaryButton.dart';
 import 'package:women_safety_app/components/custom_textfield.dart';
 import 'package:women_safety_app/utils/constants.dart';
 
+class CheckUserStatusBeforeChatOnProfile extends StatelessWidget {
+  const CheckUserStatusBeforeChatOnProfile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          if (snapshot.hasData) {
+            return ProfilePage();
+          } else {
+            Fluttertoast.showToast(msg: 'please login first');
+            return LoginScreen();
+          }
+        }
+      },
+    );
+  }
+}
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 

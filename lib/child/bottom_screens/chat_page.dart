@@ -1,11 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:women_safety_app/chat_module/chat_screen.dart';
 import 'package:women_safety_app/child/child_login_screen.dart';
 import 'package:women_safety_app/db/share_pref.dart';
 
 import '../../utils/constants.dart';
+
+class CheckUserStatusBeforeChat extends StatelessWidget {
+  const CheckUserStatusBeforeChat({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          if (snapshot.hasData) {
+            return ChatPage();
+          } else {
+            Fluttertoast.showToast(msg: 'please login first');
+            return LoginScreen();
+          }
+        }
+      },
+    );
+  }
+}
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -15,17 +39,26 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    if (FirebaseAuth.instance.currentUser!.uid.isEmpty) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()));
-    }
-  }
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     setState(() {
+  //       if (FirebaseAuth.instance.currentUser == null ||
+  //           FirebaseAuth.instance.currentUser!.uid.isEmpty) {
+  //         if (mounted) {
+  //           Navigator.push(
+  //               context, MaterialPageRoute(builder: (_) => LoginScreen()));
+  //         }
+  //       }
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
+    // WidgetsBinding.instance.addObserver();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.pink,
