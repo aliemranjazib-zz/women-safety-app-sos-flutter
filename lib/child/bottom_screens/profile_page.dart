@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
+import 'package:women_safety_app/child/bottom_page.dart';
 import 'package:women_safety_app/child/child_login_screen.dart';
 import 'package:women_safety_app/components/PrimaryButton.dart';
 import 'package:women_safety_app/components/custom_textfield.dart';
@@ -45,6 +46,10 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   TextEditingController nameC = TextEditingController();
+  TextEditingController guardianEmailC = TextEditingController();
+  TextEditingController childEmailC = TextEditingController();
+  TextEditingController phoneC = TextEditingController();
+
   final key = GlobalKey<FormState>();
   String? id;
   String? profilePic;
@@ -58,6 +63,9 @@ class _ProfilePageState extends State<ProfilePage> {
         .then((value) {
       setState(() {
         nameC.text = value.docs.first['name'];
+        childEmailC.text = value.docs.first['childEmail'];
+        guardianEmailC.text = value.docs.first['guardiantEmail'];
+        phoneC.text = value.docs.first['phone'];
         id = value.docs.first.id;
         profilePic = value.docs.first['profilePic'];
       });
@@ -66,7 +74,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getDate();
   }
@@ -74,6 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: isSaving == true
           ? Center(
               child: CircularProgressIndicator(
@@ -141,6 +149,42 @@ class _ProfilePageState extends State<ProfilePage> {
                               return null;
                             },
                           ),
+                          SizedBox(height: 10),
+                          CustomTextField(
+                            controller: childEmailC,
+                            hintText: "child email",
+                            readOnly: true,
+                            validate: (v) {
+                              if (v!.isEmpty) {
+                                return 'please enter your updated name';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 10),
+                          CustomTextField(
+                            controller: guardianEmailC,
+                            hintText: "parent email",
+                            readOnly: true,
+                            validate: (v) {
+                              if (v!.isEmpty) {
+                                return 'please enter your updated name';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 10),
+                          CustomTextField(
+                            controller: phoneC,
+                            hintText: "Phone number",
+                            readOnly: true,
+                            validate: (v) {
+                              if (v!.isEmpty) {
+                                return 'please enter your updated name';
+                              }
+                              return null;
+                            },
+                          ),
                           SizedBox(height: 25),
                           PrimaryButton(
                               title: "UPDATE",
@@ -192,6 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
           .update(data);
       setState(() {
         isSaving = false;
+        goTo(context, BottomPage());
       });
     });
   }

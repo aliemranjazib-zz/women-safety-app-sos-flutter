@@ -1,13 +1,10 @@
 import 'dart:math';
 
-import 'package:background_sms/background_sms.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shake/shake.dart';
-import 'package:telephony/telephony.dart';
 import 'package:women_safety_app/db/db_services.dart';
 import 'package:women_safety_app/model/contactsm.dart';
 import 'package:women_safety_app/widgets/home_widgets/CustomCarouel.dart';
@@ -39,56 +36,58 @@ class _HomeScreenState extends State<HomeScreen> {
   //     Fluttertoast.showToast(msg: "failed");
   //   }
   // }
-
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location services are disabled. Please enable the services')));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
-      return false;
-    }
-    return true;
-  }
-
-  _getCurrentLocation() async {
-    final hasPermission = await _handleLocationPermission();
-    final Telephony telephony = Telephony.instance;
-    await telephony.requestPhoneAndSmsPermissions;
-    if (!hasPermission) return;
-    await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high,
-            forceAndroidLocationManager: true)
-        .then((Position position) {
-      setState(() {
-        _curentPosition = position;
-        print(_curentPosition!.latitude);
-        _getAddressFromLatLon();
-      });
-    }).catchError((e) {
-      Fluttertoast.showToast(msg: e.toString());
+  String _currentCity = "";
+  checkLocationPermission() async {
+    bool permissionGranted = await _requestLocationPermission();
+    setState(() {
+      _locationPermissionGranted = permissionGranted;
     });
+
+    if (_locationPermissionGranted) {
+      _getCurrentCity();
+    }
   }
 
-  _getAddressFromLatLon() async {
+  void _getCurrentCity() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks[0];
+        setState(() {
+          _currentCity = placemark.locality ?? 'Unknown';
+        });
+        print(_currentCity);
+      }
+    } catch (e) {
+      print('Error getting current city: $e');
+    }
+  }
+
+  bool _locationPermissionGranted = false;
+  Future<bool> _requestLocationPermission() async {
+    var status = await Permission.location.request();
+    return status == PermissionStatus.granted;
+  }
+
+  void _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      print('Current Location: $position');
+      _getCurrentAddress();
+      // Handle the obtained location as needed
+    } catch (e) {
+      print('Error getting current location: $e');
+    }
+  }
+
+  String currentCity = '';
+
+  _getCurrentAddress() async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
           _curentPosition!.latitude, _curentPosition!.longitude);
@@ -97,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _curentAddress =
             "${place.locality},${place.postalCode},${place.street},";
+        print(_curentAddress);
       });
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString());
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
     getRandomQuote();
     super.initState();
     _getPermission();
-    _getCurrentLocation();
+    // _getCurrentLocation();
 
     ////// shake feature ///
 
@@ -159,17 +159,72 @@ class _HomeScreenState extends State<HomeScreen> {
                     getRandomQuote();
                   }),
               SizedBox(height: 5),
-              SizedBox(
-                height: 10,
-                child: Container(
-                  color: Colors.grey.shade100,
-                ),
-              ),
               Expanded(
                 child: ListView(
                   shrinkWrap: true,
                   children: [
                     SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  child: Icon(Icons.flight_takeoff_outlined),
+                                  backgroundColor: Colors.grey.shade300,
+                                ),
+                                SizedBox(width: 5),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _locationPermissionGranted == false
+                                        ? Text(
+                                            "Turn on location services.",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          )
+                                        : Text("Location enabled"),
+                                    SizedBox(height: 5),
+                                    _currentCity.isEmpty
+                                        ? Text(
+                                            "please enable locations for a better \nexperiences.",
+                                            maxLines: 2,
+                                            style: TextStyle(),
+                                          )
+                                        : Text("Current City $_currentCity"),
+                                    SizedBox(height: 5),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: _locationPermissionGranted == true
+                                          ? SizedBox()
+                                          : MaterialButton(
+                                              onPressed: () async {
+                                                checkLocationPermission();
+                                              },
+                                              color: Colors.grey.shade100,
+                                              shape: StadiumBorder(),
+                                              child: Text(
+                                                "Enable location",
+                                                style: TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     Align(
                       alignment: Alignment.center,
                       child: Padding(

@@ -38,7 +38,7 @@ class _ContactsPageState extends State<ContactsPage> {
       _contacts.retainWhere((element) {
         String searchTerm = searchController.text.toLowerCase();
         String searchTermFlattren = flattenPhoneNumber(searchTerm);
-        String contactName = element.displayName!.toLowerCase();
+        String contactName = element.displayName ?? "";
         bool nameMatch = contactName.contains(searchTerm);
         if (nameMatch == true) {
           return true;
@@ -128,18 +128,18 @@ class _ContactsPageState extends State<ContactsPage> {
                                   ? contactsFiltered[index]
                                   : contacts[index];
                               return ListTile(
-                                title: Text(contact.displayName!),
+                                title: Text(contact.displayName ?? ""),
                                 // subtitle:Text(contact.phones!.elementAt(0)
                                 // .value!) ,
                                 leading: contact.avatar != null &&
                                         contact.avatar!.length > 0
                                     ? CircleAvatar(
-                                        backgroundColor: primaryColor,
+                                        backgroundColor: kColorRed,
                                         backgroundImage:
                                             MemoryImage(contact.avatar!),
                                       )
                                     : CircleAvatar(
-                                        backgroundColor: primaryColor,
+                                        backgroundColor: kColorRed,
                                         child: Text(contact.initials()),
                                       ),
                                 onTap: () {

@@ -14,11 +14,13 @@ class CustomTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final Widget? prefix;
   final Widget? suffix;
+  final bool readOnly;
 
   CustomTextField(
       {this.controller,
       this.check,
       this.enable = true,
+      this.readOnly = false,
       this.focusNode,
       this.hintText,
       this.isPassword = false,
@@ -36,6 +38,7 @@ class CustomTextField extends StatelessWidget {
       enabled: enable == true ? true : enable,
       maxLines: maxLines == null ? 1 : maxLines,
       onSaved: onsave,
+      readOnly: readOnly,
       focusNode: focusNode,
       textInputAction: textInputAction,
       keyboardType: keyboardtype == null ? TextInputType.name : keyboardtype,
@@ -47,28 +50,28 @@ class CustomTextField extends StatelessWidget {
         suffixIcon: suffix,
         labelText: hintText ?? "hint text..",
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(
             style: BorderStyle.solid,
             color: Theme.of(context).primaryColor,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(
             style: BorderStyle.solid,
             color: Color(0xFF909A9E),
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(
             style: BorderStyle.solid,
             color: Theme.of(context).primaryColor,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(
             style: BorderStyle.solid,
             color: Colors.red,

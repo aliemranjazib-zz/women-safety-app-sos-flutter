@@ -11,7 +11,7 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      height: 50,
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
@@ -22,7 +22,7 @@ class PrimaryButton extends StatelessWidget {
           style: TextStyle(fontSize: 18),
         ),
         style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
+            backgroundColor: kColorRed,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30))),
       ),

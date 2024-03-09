@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:women_safety_app/chat_module/chat_screen.dart';
 import 'package:women_safety_app/child/child_login_screen.dart';
 import 'package:women_safety_app/db/share_pref.dart';
+import 'package:women_safety_app/parent/parent_home_screen.dart';
 
 import '../../utils/constants.dart';
 
@@ -20,7 +21,27 @@ class CheckUserStatusBeforeChat extends StatelessWidget {
           return CircularProgressIndicator();
         } else {
           if (snapshot.hasData) {
-            return ChatPage();
+            print("===>${snapshot.data}");
+            return StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("users")
+                  .where("id",
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                  .snapshots(),
+              builder: (context, snap) {
+                if (snap.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snap.hasData) {
+                  if (snap.data!.docs.first.data()['type'] == "parent") {
+                    return ParentHomeScreen();
+                  } else {
+                    return ChatPage();
+                  }
+                }
+                return SizedBox();
+              },
+            );
+            //return ChatPage();
           } else {
             Fluttertoast.showToast(msg: 'please login first');
             return LoginScreen();

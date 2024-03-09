@@ -101,7 +101,7 @@ class _RegisterParentScreenState extends State<RegisterParentScreen> {
                                   style: TextStyle(
                                       fontSize: 40,
                                       fontWeight: FontWeight.bold,
-                                      color: primaryColor),
+                                      color: kColorRed),
                                 ),
                                 Image.asset(
                                   'assets/logo.png',

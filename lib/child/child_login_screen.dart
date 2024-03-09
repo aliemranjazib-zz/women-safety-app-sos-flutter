@@ -30,38 +30,51 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _onSubmit() async {
     _formKey.currentState!.save();
+
     try {
-      setState(() {
-        isLoading = true;
-      });
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-              email: _formData['email'].toString(),
-              password: _formData['password'].toString());
-      if (userCredential.user != null) {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _formData['email'].toString(),
+        password: _formData['password'].toString(),
+      );
+
+      if (mounted) {
         setState(() {
           isLoading = false;
         });
+      }
+
+      if (userCredential.user != null) {
         FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user!.uid)
             .get()
             .then((value) {
-          if (value['type'] == 'parent') {
-            print(value['type']);
-            MySharedPrefference.saveUserType('parent');
-            goTo(context, ParentHomeScreen());
-          } else {
-            MySharedPrefference.saveUserType('child');
-
-            goTo(context, BottomPage());
+          if (mounted) {
+            print("====> ${value['type']}");
+            if (value['type'] == 'parent') {
+              MySharedPrefference.saveUserType('parent');
+              goTo(context, ParentHomeScreen());
+            } else {
+              MySharedPrefference.saveUserType('child');
+              goTo(context, BottomPage());
+            }
           }
         });
       }
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+
       if (e.code == 'user-not-found') {
         dialogueBox(context, 'No user found for that email.');
         print('No user found for that email.');
@@ -70,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print('Wrong password provided for that user.');
       }
     }
+
     print(_formData['email']);
     print(_formData['password']);
   }
@@ -97,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: TextStyle(
                                     fontSize: 40,
                                     fontWeight: FontWeight.bold,
-                                    color: primaryColor),
+                                    color: kColorRed),
                               ),
                               Image.asset(
                                 'assets/logo.png',

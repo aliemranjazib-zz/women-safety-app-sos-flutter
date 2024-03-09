@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:background_location/background_location.dart';
 import 'package:background_sms/background_sms.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
@@ -34,7 +35,7 @@ Future<void> initializeService() async {
     "script academy",
     "foregrounf service",
     "used for imp notifcation",
-    importance: Importance.high,
+    importance: Importance.low,
   );
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -60,6 +61,8 @@ Future<void> initializeService() async {
 
 @pragma('vm-entry-point')
 void onStart(ServiceInstance service) async {
+  Location? clocation;
+
   DartPluginRegistrant.ensureInitialized();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -75,60 +78,69 @@ void onStart(ServiceInstance service) async {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
+  await BackgroundLocation.setAndroidNotification(
+    title: "Location tracking is running in the background!",
+    message: "You can turn it off from settings menu inside the app",
+    icon: '@mipmap/ic_logo',
+  );
+  BackgroundLocation.startLocationService(
+    distanceFilter: 20,
+  );
 
-  Timer.periodic(Duration(seconds: 2), (timer) async {
-    Position? _curentPosition;
-
-    if (service is AndroidServiceInstance) {
-      if (await service.isForegroundService()) {
-        await Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.high,
-                forceAndroidLocationManager: true)
-            .then((Position position) {
-          _curentPosition = position;
-          print("bg location ${position.latitude}");
-        }).catchError((e) {
-          Fluttertoast.showToast(msg: e.toString());
-        });
-
-        ShakeDetector.autoStart(
-            shakeThresholdGravity: 7,
-            shakeSlopTimeMS: 500,
-            shakeCountResetTime: 3000,
-            minimumShakeCount: 1,
-            onPhoneShake: () async {
-              if (await Vibration.hasVibrator() ?? false) {
-                print("Test 2");
-                if (await Vibration.hasCustomVibrationsSupport() ?? false) {
-                  print("Test 3");
-                  Vibration.vibrate(duration: 1000);
-                } else {
-                  print("Test 4");
-                  Vibration.vibrate();
-                  await Future.delayed(Duration(milliseconds: 500));
-                  Vibration.vibrate();
-                }
-                print("Test 5");
-              }
-              String messageBody =
-                  "https://www.google.com/maps/search/?api=1&query=${_curentPosition!.latitude}%2C${_curentPosition!.longitude}";
-              sendMessage(messageBody);
-            });
-
-        flutterLocalNotificationsPlugin.show(
-          888,
-          "women safety app",
-          "shake feature enable",
-          NotificationDetails(
-              android: AndroidNotificationDetails(
-            "script academy",
-            "foregrounf service",
-            "used for imp notifcation",
-            icon: 'ic_bg_service_small',
-            ongoing: true,
-          )),
-        );
-      }
-    }
+  BackgroundLocation.getLocationUpdates((location) {
+    clocation = location;
   });
+  if (service is AndroidServiceInstance) {
+    if (await service.isForegroundService()) {
+      // await Geolocator.getCurrentPosition(
+      //         desiredAccuracy: LocationAccuracy.high,
+      //         forceAndroidLocationManager: true)
+      //     .then((Position position) {
+      //   _curentPosition = position;
+      //   print("bg location ${position.latitude}");
+      // }).catchError((e) {
+      //   //Fluttertoast.showToast(msg: e.toString());
+      // });
+
+      ShakeDetector.autoStart(
+          shakeThresholdGravity: 7,
+          shakeSlopTimeMS: 500,
+          shakeCountResetTime: 3000,
+          minimumShakeCount: 1,
+          onPhoneShake: () async {
+            if (await Vibration.hasVibrator() ?? false) {
+              print("Test 2");
+              if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+                print("Test 3");
+                Vibration.vibrate(duration: 1000);
+              } else {
+                print("Test 4");
+                Vibration.vibrate();
+                await Future.delayed(Duration(milliseconds: 500));
+                Vibration.vibrate();
+              }
+              print("Test 5");
+            }
+            String messageBody =
+                "https://www.google.com/maps/search/?api=1&query=${clocation!.latitude}%2C${clocation!.longitude}";
+            sendMessage(messageBody);
+          });
+
+      flutterLocalNotificationsPlugin.show(
+        888,
+        "women safety app",
+        clocation == null
+            ? "please enable location to use app"
+            : "shake feature enable ${clocation!.latitude}",
+        NotificationDetails(
+            android: AndroidNotificationDetails(
+          "script academy",
+          "foregrounf service",
+          "used for imp notifcation",
+          icon: 'ic_bg_service_small',
+          ongoing: true,
+        )),
+      );
+    }
+  }
 }
