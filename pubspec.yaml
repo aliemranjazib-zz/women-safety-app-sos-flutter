@@ -67,6 +67,8 @@ dependencies:
   telephony: ^0.2.0
   background_location: ^0.11.8
   flutter_rating_bar: ^4.0.1
+  connectivity_plus: ^5.0.2
+  restart_app: ^1.2.1
   # flutter_sms: ^2.3.3
   
 

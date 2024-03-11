@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:women_safety_app/child/bottom_screens/add_contacts.dart';
@@ -18,19 +21,65 @@ class BottomPage extends StatefulWidget {
 
 class _BottomPageState extends State<BottomPage> {
   int currentIndex = 0;
-  List<Widget> pages = [
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  List<Widget> internetPages = [
     HomeScreen(),
     AddContactsPage(),
     CheckUserStatusBeforeChat(),
     ReviewPage(),
-    // CheckUserStatusBeforeChatOnProfile(),
     SettingsPage()
-    // ReviewPage(),
+  ];
+  List<Widget> noInternetPages = [
+    HomeScreen(),
+    AddContactsPage(),
   ];
   onTapped(int index) {
     setState(() {
       currentIndex = index;
     });
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print("internet issue {'Couldn\'t check connectivity status' $e}");
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+    print("=====>>>> ${_connectionStatus}");
+  }
+
+  getConnectivity() {
+    initConnectivity();
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getConnectivity();
   }
 
   @override
@@ -42,21 +91,31 @@ class _BottomPageState extends State<BottomPage> {
         },
         child: DefaultTabController(
           initialIndex: currentIndex,
-          length: pages.length,
+          length: _connectionStatus == ConnectivityResult.none
+              ? noInternetPages.length
+              : internetPages.length,
           child: Scaffold(
-              body: pages[currentIndex],
+              body: _connectionStatus == ConnectivityResult.none
+                  ? noInternetPages[currentIndex]
+                  : internetPages[currentIndex],
               bottomNavigationBar: FABBottomAppBar(
                 onTabSelected: onTapped,
-                items: [
-                  FABBottomAppBarItem(iconData: Icons.home, text: "home"),
-                  FABBottomAppBarItem(
-                      iconData: Icons.contacts, text: "contacts"),
-                  FABBottomAppBarItem(iconData: Icons.chat, text: "chat"),
-                  FABBottomAppBarItem(
-                      iconData: Icons.rate_review, text: "Ratings"),
-                  FABBottomAppBarItem(
-                      iconData: Icons.settings, text: "Settings"),
-                ],
+                items: _connectionStatus == ConnectivityResult.none
+                    ? [
+                        FABBottomAppBarItem(iconData: Icons.home, text: "home"),
+                        FABBottomAppBarItem(
+                            iconData: Icons.contacts, text: "contacts"),
+                      ]
+                    : [
+                        FABBottomAppBarItem(iconData: Icons.home, text: "home"),
+                        FABBottomAppBarItem(
+                            iconData: Icons.contacts, text: "contacts"),
+                        FABBottomAppBarItem(iconData: Icons.chat, text: "chat"),
+                        FABBottomAppBarItem(
+                            iconData: Icons.rate_review, text: "Ratings"),
+                        FABBottomAppBarItem(
+                            iconData: Icons.settings, text: "Settings"),
+                      ],
               )),
         ));
   }

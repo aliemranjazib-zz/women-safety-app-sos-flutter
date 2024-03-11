@@ -8,16 +8,17 @@ import 'package:women_safety_app/db/db_services.dart';
 import 'package:women_safety_app/model/contactsm.dart';
 
 class SafeHome extends StatefulWidget {
+  Position? _curentPosition;
+  SafeHome(this._curentPosition);
   @override
   State<SafeHome> createState() => _SafeHomeState();
 }
 
 class _SafeHomeState extends State<SafeHome> {
-  Position? _curentPosition;
   String? _curentAddress;
   LocationPermission? permission;
 
-  _isPermissionGranted() async => await Permission.sms.status.isGranted;
+  // _isPermissionGranted() async => await Permission.sms.status.isGranted;
   _sendSms(String phoneNumber, String message, {int? simSlot}) async {
     SmsStatus result = await BackgroundSms.sendMessage(
         phoneNumber: phoneNumber, message: message, simSlot: 1);
@@ -29,72 +30,72 @@ class _SafeHomeState extends State<SafeHome> {
     }
   }
 
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  // Future<bool> _handleLocationPermission() async {
+  //   bool serviceEnabled;
+  //   LocationPermission permission;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location services are disabled. Please enable the services')));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Location permissions are denied')));
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(
-              'Location permissions are permanently denied, we cannot request permissions.')));
-      return false;
-    }
-    return true;
-  }
+  //   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //         content: Text(
+  //             'Location services are disabled. Please enable the services')));
+  //     return false;
+  //   }
+  //   permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text('Location permissions are denied')));
+  //       return false;
+  //     }
+  //   }
+  //   if (permission == LocationPermission.deniedForever) {
+  //     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //         content: Text(
+  //             'Location permissions are permanently denied, we cannot request permissions.')));
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
-  _getCurrentLocation() async {
-    final hasPermission = await _handleLocationPermission();
-    if (!hasPermission) return;
-    await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high,
-            forceAndroidLocationManager: true)
-        .then((Position position) {
-      setState(() {
-        _curentPosition = position;
-        print(_curentPosition!.latitude);
-        _getAddressFromLatLon();
-      });
-    }).catchError((e) {
-      Fluttertoast.showToast(msg: e.toString());
-    });
-  }
+  // _getCurrentLocation() async {
+  //   final hasPermission = await _handleLocationPermission();
+  //   if (!hasPermission) return;
+  //   await Geolocator.getCurrentPosition(
+  //           desiredAccuracy: LocationAccuracy.high,
+  //           forceAndroidLocationManager: true)
+  //       .then((Position position) {
+  //     setState(() {
+  //       _curentPosition = position;
+  //       print(_curentPosition!.latitude);
+  //       _getAddressFromLatLon();
+  //     });
+  //   }).catchError((e) {
+  //     Fluttertoast.showToast(msg: e.toString());
+  //   });
+  // }
 
-  _getAddressFromLatLon() async {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-          _curentPosition!.latitude, _curentPosition!.longitude);
+  // _getAddressFromLatLon() async {
+  //   try {
+  //     List<Placemark> placemarks = await placemarkFromCoordinates(
+  //         _curentPosition!.latitude, _curentPosition!.longitude);
 
-      Placemark place = placemarks[0];
-      setState(() {
-        _curentAddress =
-            "${place.locality},${place.postalCode},${place.street},";
-      });
-    } catch (e) {
-      Fluttertoast.showToast(msg: e.toString());
-    }
-  }
+  //     Placemark place = placemarks[0];
+  //     setState(() {
+  //       _curentAddress =
+  //           "${place.locality},${place.postalCode},${place.street},";
+  //     });
+  //   } catch (e) {
+  //     Fluttertoast.showToast(msg: e.toString());
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
 
-    _getCurrentLocation();
+    // _getCurrentLocation();
   }
 
   showModelSafeHome(BuildContext context) {
@@ -114,12 +115,12 @@ class _SafeHomeState extends State<SafeHome> {
                   style: TextStyle(fontSize: 20),
                 ),
                 SizedBox(height: 10),
-                if (_curentPosition != null) Text(_curentAddress!),
-                PrimaryButton(
-                    title: "GET LOCATION",
-                    onPressed: () {
-                      _getCurrentLocation();
-                    }),
+                // if (_curentPosition != null) Text(_curentAddress!),
+                // PrimaryButton(
+                //     title: "GET LOCATION",
+                //     onPressed: () {
+                //       _getCurrentLocation();
+                //     }),
                 SizedBox(height: 10),
                 PrimaryButton(
                     title: "SEND ALERT",
@@ -133,16 +134,12 @@ class _SafeHomeState extends State<SafeHome> {
                             msg: "emergency contact is empty");
                       } else {
                         String messageBody =
-                            "https://www.google.com/maps/search/?api=1&query=${_curentPosition!.latitude}%2C${_curentPosition!.longitude}. $_curentAddress";
+                            "https://www.google.com/maps/search/?api=1&query=${widget._curentPosition!.latitude}%2C${widget._curentPosition!.longitude}. $_curentAddress";
 
-                        if (await _isPermissionGranted()) {
-                          contactList.forEach((element) {
-                            _sendSms("${element.number}",
-                                "i am in trouble $messageBody");
-                          });
-                        } else {
-                          Fluttertoast.showToast(msg: "something wrong");
-                        }
+                        contactList.forEach((element) {
+                          _sendSms("${element.number}",
+                              "i am in trouble $messageBody");
+                        });
                       }
                     }),
               ],
