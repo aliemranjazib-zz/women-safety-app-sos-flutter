@@ -8,7 +8,7 @@ List sweetSayings = [
 ];
 
 List<String> articleTitle = [
-  "Pakistani women are inspiring country",
+  "Indians women are inspiring country",
   "We have to end Violance",
   "Be a change",
   "You are strong"

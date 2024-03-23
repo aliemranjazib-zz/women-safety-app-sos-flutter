@@ -34,25 +34,25 @@ class CustomCarouel extends StatelessWidget {
                       context,
                       SafeWebView(
                           url:
-                              "https://gulfnews.com/world/asia/pakistan/womens-day-10-pakistani-women-inspiring-the-country-1.77696239"));
+                              "https://artsandculture.google.com/project/indias-women-in-culture"));
                 } else if (index == 1) {
                   navigateToRoute(
                       context,
                       SafeWebView(
                           url:
-                              "https://plan-international.org/ending-violence/16-ways-end-violence-girls"));
+                              "https://www.business-standard.com/content/press-releases-ani/top-10-inspiring-indian-women-achievers-you-should-follow-in-2023-123100300787_1.html"));
                 } else if (index == 2) {
                   navigateToRoute(
                       context,
                       SafeWebView(
                           url:
-                              "https://www.healthline.com/health/womens-health/self-defense-tips-escape"));
+                              "https://amritmahotsav.nic.in/blogdetail.htm?75"));
                 } else {
                   navigateToRoute(
                       context,
                       SafeWebView(
                           url:
-                              "https://www.healthline.com/health/womens-health/self-defense-tips-escape"));
+                              "https://www.herzindagi.com/inspiration/inspirational-quotes-by-powerful-women-of-india-article-67961"));
                 }
               },
               child: Container(
